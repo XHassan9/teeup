@@ -681,8 +681,7 @@ function installCard(){if(STANDALONE()||S.instHide===ROUND+'|'+new Date().getHou
  else return'';
  return`<div class="card" style="border:2px solid #c9a24a;background:#fffaf0"><h2 style="font-size:17px">📲 Put the app on your phone — 30 seconds</h2>${body}
  <div class="src" style="margin-top:8px">${IOS?'Doing this also lets your phone buzz when your group posts a score.':'It opens full screen with its own icon.'}</div>
- <button class="btn alt" style="margin-top:8px" onclick="S.instHide=ROUND+'|'+new Date().getHours();save();draw()">Not now</button></div>
- ${IOS&&!CRIOS&&!INAPP&&!OTHER_IOS?'<div class="iosarrow">⬇︎</div>':''}`}
+ <button class="btn alt" style="margin-top:8px" onclick="S.instHide=ROUND+'|'+new Date().getHours();save();draw()">Not now</button></div>`}
 
 function draw(){const V={lb:vLB,sk:vSK,kp:vKP,sc:vSC,mo:vMO,co:vCO,px:vPX,ph:vPH,sd:vSD,ru:vRU,st:vST,gm:vGM,mr:vMR,sb:vSB,nt:vNT,me:vME,bc:vBC,og:vOG,ab:vAB,tv:vTV};if(!V[S.tab])S.tab='lb';const par=PARENT[S.tab];document.body.classList.toggle('tvm',S.tab==='tv');head();ticker();if(LIVE)setSync(SYNC);
  document.getElementById('app').innerHTML=(LIVE&&S.tab!=='og'?installCard():'')+(LIVE&&!S.meSet&&S.tab!=='og'?whoCard():'')+(par?`<button class="back" onclick="go('${par}')">← Back to ${par==='gm'?'Games':'More'}</button>`:'')+V[S.tab]();

@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e3a2c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="TeeUp CLT">
+<title>TeeUp CLT</title>
+<meta name="description" content="Score your round, share it with your group, track your own index and find Charlotte golf events. Beta by TAZ.">
+<style>
+:root{
+  --pine:#0e3a2c; --pine2:#165440; --fair:#2f7d57; --cream:#f6f1e4; --card:#ffffff;
+  --ink:#16201b; --mute:#5f6d65; --line:#e3dccb; --taz:#ff7a1a; --gold:#c9a227; --red:#c0392b;
+  --bg:#f3eee1;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --card:#17221d; --ink:#eef2ee; --mute:#9fb0a6; --line:#2a3a32; --bg:#0d1612; --cream:#1b2822; }
+}
+:root[data-theme="dark"]{ --card:#17221d; --ink:#eef2ee; --mute:#9fb0a6; --line:#2a3a32; --bg:#0d1612; --cream:#1b2822; }
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+button,input,select{font:inherit;color:inherit}
+a{color:var(--fair)}
+.app{max-width:560px;margin:0 auto;min-height:100vh;padding-bottom:92px}
+header.top{background:linear-gradient(160deg,var(--pine),var(--pine2));color:#fff;padding:calc(14px + env(safe-area-inset-top)) 16px 18px;position:relative;overflow:hidden}
+header.top:after{content:"";position:absolute;right:-60px;top:-40px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(255,122,26,.35),transparent 65%)}
+.brand{display:flex;align-items:center;gap:10px;position:relative;z-index:1}
+.logo{width:38px;height:38px;border-radius:11px;background:#fff;display:grid;place-items:center}
+.brand b{font-size:20px;letter-spacing:.3px}
+.brand small{display:block;font-size:12px;opacity:.8;font-weight:500}
+.beta{margin-left:auto;background:var(--taz);color:#1b0f05;font-weight:800;font-size:11px;padding:4px 8px;border-radius:999px;letter-spacing:.6px}
+.hero{position:relative;z-index:1;margin-top:14px}
+.hero h1{margin:0;font-size:24px;line-height:1.2}
+.hero p{margin:6px 0 0;opacity:.85;font-size:14px}
+main{padding:14px 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
+.card h2{margin:0 0 8px;font-size:17px}
+.card h3{margin:0 0 6px;font-size:15px}
+.mute{color:var(--mute);font-size:14px}
+.row{display:flex;gap:10px;align-items:center}
+.grow{flex:1}
+.btn{border:0;border-radius:12px;padding:12px 14px;font-weight:700;background:var(--pine);color:#fff;cursor:pointer;min-height:46px}
+.btn.alt{background:var(--cream);color:var(--ink);border:1px solid var(--line)}
+.btn.taz{background:var(--taz);color:#1b0f05}
+.btn.block{width:100%}
+.btn.sm{min-height:36px;padding:7px 11px;font-size:14px;border-radius:10px}
+.pill{display:inline-block;font-size:12px;font-weight:700;padding:3px 8px;border-radius:999px;background:var(--cream);border:1px solid var(--line)}
+.pill.charity{background:#fde9dc;color:#8a3a07;border-color:#f6c7a6}
+.pill.pro{background:#e3ecff;color:#1c3d8a;border-color:#c2d3fb}
+.pill.junior{background:#e2f4e9;color:#165c36;border-color:#b9e2c9}
+.pill.am{background:#f3ecd2;color:#6b5510;border-color:#e2d49a}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom);z-index:20}
+nav.tabs .in{display:flex;max-width:560px;width:100%}
+nav.tabs button{flex:1;background:none;border:0;padding:9px 2px 10px;font-size:11px;font-weight:700;color:var(--mute);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
+nav.tabs button.on{color:var(--fair)}
+nav.tabs svg{width:24px;height:24px}
+.stat{display:flex;gap:10px}
+.stat>div{flex:1;background:var(--cream);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+.stat b{display:block;font-size:24px}
+.stat span{font-size:12px;color:var(--mute)}
+label.f{display:block;font-size:13px;font-weight:700;color:var(--mute);margin:10px 0 4px}
+input.t,select.t{width:100%;padding:11px 12px;border-radius:11px;border:1px solid var(--line);background:var(--card);min-height:46px}
+.ev{display:flex;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+.ev:first-of-type{border-top:0}
+.date{width:52px;flex:none;text-align:center;background:var(--pine);color:#fff;border-radius:12px;padding:6px 0;line-height:1.1}
+.date b{display:block;font-size:20px}
+.date span{font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+.ev h4{margin:0 0 2px;font-size:15px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 12px}
+.chips button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:7px 12px;font-size:13px;font-weight:700;cursor:pointer}
+.chips button.on{background:var(--pine);color:#fff;border-color:var(--pine)}
+.hole{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.hole .num{font-size:34px;font-weight:800}
+.prow{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.prow:first-child{border-top:0}
+.sc{display:flex;align-items:center;gap:8px}
+.sc button{width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:var(--cream);font-size:24px;font-weight:700;cursor:pointer}
+.sc output{min-width:36px;text-align:center;font-size:26px;font-weight:800}
+.tag{font-size:11px;font-weight:800;padding:2px 6px;border-radius:6px}
+.tag.b{background:#d8f1e2;color:#11603a}.tag.e{background:#ffe7a6;color:#6b4b00}.tag.k{background:#f4d6d2;color:#7d241b}
+table.lb{width:100%;border-collapse:collapse;font-size:15px}
+table.lb td,table.lb th{padding:9px 6px;border-top:1px solid var(--line);text-align:left}
+table.lb th{font-size:12px;color:var(--mute);border-top:0}
+.grid{overflow-x:auto}
+.grid table{border-collapse:collapse;font-size:13px;min-width:100%}
+.grid td,.grid th{border:1px solid var(--line);padding:5px 6px;text-align:center}
+.grid th{background:var(--cream)}
+.share{background:linear-gradient(140deg,#1b0f05,#3a1d08);color:#fff;border:0}
+.share .mute{color:#f5d8c2}
+.toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:700;font-size:14px;opacity:0;transition:.25s;pointer-events:none;z-index:50}
+.toast.on{opacity:1}
+.empty{text-align:center;padding:18px 6px}
+.note{font-size:12px;color:var(--mute);margin-top:8px}
+.banner{background:#fff4e8;border:1px solid #f6c7a6;color:#5b2a06;border-radius:14px;padding:12px;margin-bottom:12px;font-size:14px}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .banner{background:#2b1a0d;color:#ffd9bd;border-color:#5b3416}}
+.x{float:right;background:none;border:0;font-size:20px;color:var(--mute);cursor:pointer}
+.big{font-size:40px;font-weight:800;line-height:1}
+.list a{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-top:1px solid var(--line);text-decoration:none;color:var(--ink)}
+.list a:first-child{border-top:0}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="26" height="26"><circle cx="16" cy="11" r="7" fill="#0e3a2c"/><circle cx="13.5" cy="9" r="1" fill="#fff"/><circle cx="17" cy="8" r="1" fill="#fff"/><circle cx="18.5" cy="11.5" r="1" fill="#fff"/><circle cx="14.5" cy="12.5" r="1" fill="#fff"/><path d="M13 19h6l-1.5 10h-3z" fill="#ff7a1a"/></svg>
+      </div>
+      <div><b>TeeUp CLT</b><small>by TAZ · Charlotte, NC</small></div>
+      <span class="beta">BETA</span>
+    </div>
+    <div class="hero" id="hero"></div>
+  </header>
+  <main id="view"></main>
+</div>
+<nav class="tabs"><div class="in" id="tabs"></div></nav>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- storage (safe) ---------- */
+const KEY='teeupclt.v1';
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return {}}}
+let S=Object.assign({me:{name:'',phone:'',email:''},rounds:[],live:null,tab:'home',evf:'all',joined:false},load());
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+
+/* ---------- data ---------- */
+const TODAY=new Date();
+const COURSES=[
+ {n:'The Tradition Golf Club',a:'3800 Prosperity Church Rd, Charlotte',h:18,type:'County-owned public',src:'https://parkandrec.mecknc.gov/Places-to-Visit/Golf-Courses'},
+ {n:'Dr. Charles L. Sifford Golf Course',a:'Revolution Park, Charlotte',h:9,type:'County-owned public, 9 holes',src:'https://parkandrec.mecknc.gov/Places-to-Visit/Golf-Courses'},
+ {n:'Harry L. Jones Sr. Golf Course',a:'Charlotte',h:18,type:'County-owned public',src:'https://parkandrec.mecknc.gov/Places-to-Visit/Golf-Courses'},
+ {n:'Charles T. Myers Golf Course',a:'Charlotte',h:18,type:'County-owned public, with range',src:'https://parkandrec.mecknc.gov/Places-to-Visit/Golf-Courses'},
+ {n:'Sunset Hills Golf Course',a:'Charlotte',h:18,type:'County-owned public, plus learner course',src:'https://parkandrec.mecknc.gov/Places-to-Visit/Golf-Courses'},
+ {n:'Highland Creek Golf Club',a:'Charlotte',h:18,type:'Public',src:'https://charitygolfer.com/north-carolina/charlotte/course/highland-creek-golf-club'},
+ {n:'Paradise Valley',a:'Charlotte',h:18,type:'Course',src:'https://charitygolfer.com/north-carolina/charlotte/course/paradise-valley'}
+];
+const CG='https://charitygolfer.com/north-carolina/charlotte';
+const EVENTS=[
+ {d:'2026-11-30',e:'2026-12-18',t:'First Tee post-fall junior clinics',w:'Sifford GC and FTGC Learning Center at Pineville',c:'junior',x:'$10 per one-hour clinic, ages grouped, new players welcome, financial aid available.',u:'https://firstteegreatercharlotte.org/2026-post-fall-golf-clinics/'},
+ {d:'2026-12-01',t:'Annual Golf Tournament (IREM)',w:'Venue TBA',c:'charity',x:'Benefits the Institute of Real Estate Management.',u:'https://charitygolfer.com/north-carolina/charlotte/golf-tournament-50399'},
+ {d:'2026-12-06',t:'Tee Off for Hope (Duck Race Breakfast of Hope)',w:'Venue TBA',c:'charity',x:'Benefits Kinder-Mourn.',u:'https://charitygolfer.com/north-carolina/charlotte/duck-race-breakfast-of-hope-tee-off-for-hope-golf'},
+ {d:'2027-01-05',e:'2027-02-11',t:'First Tee winter programs',w:'Dr. Charles L. Sifford Golf Course',c:'junior',x:'Six weekly one-hour sessions, Tue/Wed/Thu afternoons by age group. $60 + $50 2027 membership.',u:'https://firstteegreatercharlotte.org/2027-winter-practice-series-at-dr-charles-l-sifford-golf-course/'},
+ {d:'2027-02-03',t:'Annual Golf Tournament (IREM)',w:'Venue TBA',c:'charity',x:'Benefits the Institute of Real Estate Management.',u:'https://charitygolfer.com/north-carolina/charlotte/golf-tournament-50400'},
+ {d:'2027-04-12',t:'26th Links FORE Life Golf Tournament',w:'Providence Country Club',c:'charity',x:'Benefits MiraVia.',u:'https://charitygolfer.com/north-carolina/charlotte/links-fore-life-golf-tournament-presented-by-monk-law-firm-pllc'},
+ {d:'2027-04-15',t:'15th Annual Charity Golf Tournament',w:'Olde Sycamore Golf Plantation',c:'charity',x:'Benefits Adult Day and Health Care Services.',u:'https://charitygolfer.com/north-carolina/charlotte/charity-golf-tournament-charlotte'},
+ {d:'2027-04-19',t:'7th Annual Meggs Charity Golf Classic',w:'TPC Piper Glen',c:'charity',x:'Benefits The Meggs Foundation.',u:'https://charitygolfer.com/north-carolina/charlotte/the-meggs-charity-golf-classic'},
+ {d:'2027-04-19',t:'49er Club Golf Outing',w:'Pine Island Country Club',c:'charity',x:'Benefits the Charlotte 49ers Athletic Foundation.',u:'https://charitygolfer.com/north-carolina/charlotte/49er-club-golf-outing-slated-for-april-20-charlotte-athletics'},
+ {d:'2027-04-22',t:'AIA Charlotte Golf Tournament',w:'Venue TBA',c:'charity',x:'AIA Charlotte section event.',u:'https://www.aiacharlotte.org/event-pages/aia-charlotte-golf-tournament/'},
+ {d:'2027-04-26',t:'Providence HS Athletics Scholarship Golf Classic',w:'Providence Country Club',c:'charity',x:'Senior athlete scholarships.',u:'https://charitygolfer.com/north-carolina/charlotte/providence-hs-athletics-scholarship-golf-classic'},
+ {d:'2027-04-28',e:'2027-05-03',t:'76th Carolinas Four-Ball Championship',w:'Camden Country Club, Camden SC',c:'am',x:'Carolinas Golf Association championship, about 90 minutes from Charlotte.',u:'https://www.carolinasgolf.org/futuresites'},
+ {d:'2027-05-03',t:'Doggett Concrete Golf Tournament',w:'Ballantyne Country Club',c:'charity',x:'Benefits Roof Above, Autism Strong and Tunnels to Towers.',u:'https://charitygolfer.com/north-carolina/charlotte/doggett-concrete-golf-tournament'},
+ {d:'2027-05-10',t:'Sunny Harris Hutchinson Memorial Golf Tournament',w:'Providence Country Club',c:'charity',x:'Benefits the Harris YMCA.',u:'https://charitygolfer.com/north-carolina/charlotte/sunny-harris-hutchinson-memorial-golf-tournament'},
+ {d:'2027-05-10',e:'2027-05-16',t:'Truist Championship',w:'Quail Hollow Club',c:'pro',x:'PGA TOUR week in Charlotte. Tickets on the official site.',u:'https://www.truistchampionship.com/tickets'},
+ {d:'2027-05-17',t:'Henry A. Harkey Memorial Golf Tournament',w:'TPC Piper Glen',c:'charity',x:'Benefits Scouting.',u:'https://charitygolfer.com/north-carolina/charlotte/the-henry-a-harkey-memorial-golf-tournament-3'},
+ {d:'2027-05-21',t:'NAWIC Charlotte Annual Golf Tournament',w:'Highland Creek Golf Club',c:'charity',x:'Fundraising event.',u:'https://charitygolfer.com/north-carolina/charlotte/nawic-charlotte-golf-tournament-fundraising-event'},
+ {d:'2027-06-24',t:'36th Ray A. Booton Golf Classic',w:'The Tradition Golf Club',c:'charity',x:'Benefits the Kappa Foundation of Charlotte.',u:'https://charitygolfer.com/north-carolina/charlotte/ray-a-booton-golf-classic'},
+ {d:'2027-09-18',t:'Muggsy Bogues Celebrity Golf Classic',w:'TPC Piper Glen',c:'charity',x:'Benefits the Muggsy Bogues Family Foundation.',u:'https://charitygolfer.com/north-carolina/charlotte/muggsy-bogues-celebrity-golf-classic'}
+];
+const CAT={all:'All',charity:'Charity',junior:'First Tee & junior',pro:'Pro',am:'Amateur'};
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function pd(s){const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)}
+function fmt(s){const d=pd(s);return MON[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear()}
+function upcoming(){const t=new Date(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate());return EVENTS.filter(e=>pd(e.e||e.d)>=t).sort((a,b)=>pd(a.d)-pd(b.d))}
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1900)}
+function enc(o){return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+function dec(s){s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';return JSON.parse(decodeURIComponent(escape(atob(s))))}
+function base(){return location.href.split('#')[0]}
+function ini(n){return (n||'?').trim().split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase()}
+function tot(arr){return arr.reduce((a,b)=>a+(b||0),0)}
+
+/* ---------- index math (WHS-style, unofficial) ---------- */
+function diff(r){return (113/r.slope)*(r.gross-r.rating)}
+function indexOf(rounds){
+  const ds=rounds.filter(r=>r.holes===18).slice(-20).map(diff).sort((a,b)=>a-b);const n=ds.length;
+  if(n<3)return null;
+  const T={3:[1,-2],4:[1,-1],5:[1,0],6:[2,-1],7:[2,0],8:[2,0],9:[3,0],10:[3,0],11:[3,0],12:[4,0],13:[4,0],14:[4,0],15:[5,0],16:[5,0],17:[6,0],18:[6,0],19:[7,0],20:[8,0]};
+  const [k,adj]=T[n];const avg=ds.slice(0,k).reduce((a,b)=>a+b,0)/k;return Math.min(54,Math.round((avg+adj)*10)/10);
+}
+
+/* ---------- round logic ---------- */
+function newRound(o){return {id:Date.now().toString(36),course:o.course,date:new Date().toISOString().slice(0,10),holes:o.holes,par:Array(o.holes).fill(4).map((p,i)=>o.holes===18?[4,4,3,5,4,4,3,4,5,4,4,3,5,4,4,3,4,5][i]:[4,4,3,5,4,4,3,4,5][i]),rating:o.rating,slope:o.slope,fmt:o.fmt,players:o.players.map(n=>({n,s:Array(o.holes).fill(null)})),h:0,host:S.me.name||'',hostTel:S.me.phone||'',hostMail:S.me.email||''}}
+function toPar(p,r){let t=0;p.s.forEach((v,i)=>{if(v)t+=v-r.par[i]});return t}
+function played(p){return p.s.filter(Boolean).length}
+function skins(r){const won=r.players.map(()=>0);let carry=1;const log=[];
+  for(let i=0;i<r.holes;i++){const sc=r.players.map(p=>p.s[i]);if(sc.some(v=>!v)){continue}
+    const lo=Math.min(...sc);const w=sc.filter(v=>v===lo).length;
+    if(w===1){const k=sc.indexOf(lo);won[k]+=carry;log.push({h:i+1,who:r.players[k].n,n:carry});carry=1}else carry++}
+  return {won,log,carry}}
+function tp(v){return v===0?'E':(v>0?'+'+v:''+v)}
+function badge(v,par){if(!v)return'';const d=v-par;if(d<=-2)return'<span class="tag e">Eagle</span>';if(d===-1)return'<span class="tag b">Birdie</span>';if(d>=2)return'<span class="tag k">'+(d===2?'Double':'+'+d)+'</span>';return''}
+
+/* ---------- share ---------- */
+function shareLink(r){return base()+'#r='+enc(r)}
+async function shareRound(r,first){
+  const url=shareLink(r);
+  const who=r.host?r.host+' ':'';
+  const text=first?`${who}started a round at ${r.course} on TeeUp CLT. Open it to see the card, follow along and try the beta:`:`Scores so far at ${r.course} (thru ${Math.max(...r.players.map(played))}):`;
+  if(navigator.share){try{await navigator.share({title:'TeeUp CLT',text,url});return}catch(e){if(e&&e.name==='AbortError')return}}
+  try{await navigator.clipboard.writeText(text+' '+url);toast('Link copied. Paste it in your group text.')}catch(e){prompt('Copy this link',url)}
+}
+
+/* ---------- incoming link ---------- */
+let INCOMING=null;
+(function(){const m=location.hash.match(/#r=([^&]+)/);if(m){try{INCOMING=dec(m[1]);S.tab='shared'}catch(e){INCOMING=null}}})();
+
+/* ---------- views ---------- */
+const ICONS={
+ home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>',
+ play:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 21V3l12 5-12 5"/></svg>',
+ index:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V9m6 10V5m6 14v-7m4 7H2"/></svg>',
+ events:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4m8-4v4"/></svg>',
+ more:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>'
+};
+const TABS=[['home','Home'],['play','Play'],['index','My Index'],['events','Events'],['more','Me']];
+function tabs(){ $('#tabs').innerHTML=TABS.map(([k,l])=>`<button class="${S.tab===k||(k==='play'&&S.tab==='shared')?'on':''}" onclick="go('${k}')">${ICONS[k]}${l}</button>`).join('')}
+function go(t){S.tab=t;save();render();scrollTo(0,0)}
+function hero(){
+  const h={home:['Golf, Charlotte style.','Score your round, send it to your group, and see what is happening around town.'],
+   play:S.live?[S.live.course,`Hole ${S.live.h+1} · ${S.live.fmt==='skins'?'Skins':'Stroke play'}`]:['Start a round','Pick a course, add your group, and send them the link.'],
+   index:['My TeeUp Index','Your own scoring trend from the rounds you save here.'],
+   events:['Charlotte golf calendar','Charity outings, First Tee, the pros and more.'],
+   more:['Me and the beta','Your info rides along on the links you share.'],
+   shared:['A round was shared with you','Here is the card. Want your own? Join the beta below.']}[S.tab];
+  $('#hero').innerHTML=`<h1>${esc(h[0])}</h1><p>${esc(h[1])}</p>`;
+}
+function vHome(){
+  const ix=indexOf(S.rounds);const up=upcoming().slice(0,3);
+  return `${!S.me.name?`<div class="banner"><button class="x" onclick="go('more')">›</button><b>First time here?</b> Add your name on the Me tab so your group knows who sent the link.</div>`:''}
+  <div class="card">
+    ${S.live?`<h2>Round in progress</h2><p class="mute">${esc(S.live.course)} · thru ${Math.max(...S.live.players.map(played))}</p><button class="btn block" onclick="go('play')">Back to the card</button>`
+    :`<h2>Heading out?</h2><p class="mute">Set up the card in about 30 seconds and text the link to your playing partners.</p><button class="btn taz block" onclick="go('play')">Start a round</button>`}
+  </div>
+  <div class="card"><div class="stat">
+    <div><b>${ix===null?'—':ix.toFixed(1)}</b><span>TeeUp Index</span></div>
+    <div><b>${S.rounds.length}</b><span>Rounds saved</span></div>
+    <div><b>${S.rounds.length?Math.min(...S.rounds.map(r=>r.gross)):'—'}</b><span>Best 18</span></div>
+  </div>${ix===null?`<p class="note">Save 3 full rounds to see your index.</p>`:''}</div>
+  <div class="card"><div class="row"><h2 class="grow">Coming up in Charlotte</h2><button class="btn alt sm" onclick="go('events')">All</button></div>${up.map(evRow).join('')}</div>
+  <div class="card"><h2>Give back with First Tee</h2><p class="mute">First Tee of Greater Charlotte runs youth golf at Sifford and Pineville. Volunteer coaches are always welcome.</p><a class="btn alt block" style="display:block;text-align:center;text-decoration:none" href="https://firstteegreatercharlotte.org/get-involved-2/" target="_blank" rel="noopener">How to get involved</a></div>`;
+}
+function evRow(e){const d=pd(e.d);return `<div class="ev"><div class="date"><span>${MON[d.getMonth()]}</span><b>${d.getDate()}</b></div><div class="grow"><h4>${esc(e.t)}</h4><div class="mute">${esc(e.w)}${e.e?` · through ${fmt(e.e)}`:''}</div><div style="margin:4px 0"><span class="pill ${e.c}">${CAT[e.c]}</span></div><div class="mute" style="font-size:13px">${esc(e.x)} <a href="${e.u}" target="_blank" rel="noopener">Details</a></div></div></div>`}
+function vEvents(){
+  const list=upcoming().filter(e=>S.evf==='all'||e.c===S.evf);
+  return `<div class="chips">${Object.keys(CAT).map(k=>`<button class="${S.evf===k?'on':''}" onclick="S.evf='${k}';save();render()">${CAT[k]}</button>`).join('')}</div>
+  <div class="card">${list.length?list.map(evRow).join(''):'<div class="empty mute">Nothing in this category right now.</div>'}</div>
+  <p class="note">Charity dates come from organizer listings on <a href="${CG}" target="_blank" rel="noopener">CharityGolfer</a> and can change. Always confirm with the organizer before you register.</p>`;
+}
+function vPlay(){
+  if(S.live)return vCard(S.live,true);
+  const opts=COURSES.map(c=>`<option>${esc(c.n)}</option>`).join('');
+  return `<div class="card"><h2>New round</h2>
+   <label class="f">Course</label><select class="t" id="c">${opts}<option value="__other">Other course…</option></select>
+   <input class="t" id="co" placeholder="Course name" style="display:none;margin-top:8px">
+   <div class="row" style="margin-top:2px">
+     <div class="grow"><label class="f">Holes</label><select class="t" id="ho"><option>18</option><option>9</option></select></div>
+     <div class="grow"><label class="f">Game</label><select class="t" id="fm"><option value="stroke">Stroke play</option><option value="skins">Skins</option></select></div>
+   </div>
+   <div class="row">
+     <div class="grow"><label class="f">Course rating</label><input class="t" id="cr" inputmode="decimal" value="72.0"></div>
+     <div class="grow"><label class="f">Slope</label><input class="t" id="sl" inputmode="numeric" value="113"></div>
+   </div>
+   <p class="note">Rating and slope are on the scorecard for the tees you play. They only affect your index.</p>
+   <label class="f">Players (you first)</label>
+   <div id="pl">${[S.me.name||'',' ',' ',' '].map((n,i)=>`<input class="t pi" style="margin-bottom:8px" placeholder="${i?'Player '+(i+1):'Your name'}" value="${esc(n.trim())}">`).join('')}</div>
+   <button class="btn taz block" onclick="startRound()">Tee it up</button></div>`;
+}
+function startRound(){
+  let course=$('#c').value;if(course==='__other')course=($('#co').value||'').trim()||'My course';
+  const ps=[...document.querySelectorAll('.pi')].map(i=>i.value.trim()).filter(Boolean);
+  if(!ps.length){toast('Add at least one player');return}
+  if(!S.me.name){S.me.name=ps[0]}
+  const r=newRound({course,holes:+$('#ho').value,fmt:$('#fm').value,rating:parseFloat($('#cr').value)||72,slope:parseInt($('#sl').value)||113,players:ps});
+  S.live=r;save();render();
+  setTimeout(()=>{if(confirm('Send the round link to your group now?'))shareRound(r,true)},250);
+}
+function vCard(r,editable){
+  const i=r.h;const thru=Math.max(...r.players.map(played));
+  const rank=[...r.players].map((p,k)=>({p,k})).sort((a,b)=>toPar(a.p,r)-toPar(b.p,r)||tot(a.p.s)-tot(b.p.s));
+  const sk=r.fmt==='skins'?skins(r):null;
+  return `${editable?`<div class="card"><div class="hole"><button class="btn alt sm" onclick="mv(-1)" ${i===0?'disabled':''}>‹ Prev</button>
+    <div style="text-align:center"><div class="num">${i+1}</div><button class="pill" onclick="setPar()">Par ${r.par[i]} ✎</button></div>
+    <button class="btn alt sm" onclick="mv(1)" ${i===r.holes-1?'disabled':''}>Next ›</button></div>
+    ${r.players.map((p,k)=>`<div class="prow"><div class="grow"><b>${esc(p.n)}</b> ${badge(p.s[i],r.par[i])}<div class="mute" style="font-size:13px">${tp(toPar(p,r))} · ${tot(p.s)||0} total</div></div>
+      <div class="sc"><button onclick="sc(${k},-1)" aria-label="minus">−</button><output>${p.s[i]||'–'}</output><button onclick="sc(${k},1)" aria-label="plus">+</button></div></div>`).join('')}
+  </div>`:''}
+  <div class="card"><h2>${r.fmt==='skins'?'Skins & leaderboard':'Leaderboard'} <span class="mute" style="font-weight:500">· thru ${thru}</span></h2>
+  <table class="lb"><tr><th>#</th><th>Player</th><th>To par</th><th>Total</th>${sk?'<th>Skins</th>':''}</tr>
+  ${rank.map((x,n)=>`<tr><td>${n+1}</td><td><b>${esc(x.p.n)}</b></td><td>${tp(toPar(x.p,r))}</td><td>${tot(x.p.s)||'–'}</td>${sk?`<td>${sk.won[x.k]}</td>`:''}</tr>`).join('')}</table>
+  ${sk?`<p class="note">${sk.log.length?sk.log.map(l=>`#${l.h}: ${esc(l.who)}${l.n>1?' ('+l.n+')':''}`).join(' · '):'No skins won yet.'}${sk.carry>1?` · ${sk.carry-1} carrying over`:''}</p>`:''}</div>
+  <div class="card grid"><table><tr><th>Hole</th>${r.par.map((_,j)=>`<th>${j+1}</th>`).join('')}<th>Tot</th></tr>
+  <tr><th>Par</th>${r.par.map(p=>`<td>${p}</td>`).join('')}<td>${tot(r.par)}</td></tr>
+  ${r.players.map(p=>`<tr><th style="text-align:left">${esc(ini(p.n))}</th>${p.s.map(v=>`<td>${v||''}</td>`).join('')}<td><b>${tot(p.s)||''}</b></td></tr>`).join('')}</table></div>
+  ${editable?`<div class="card share"><h2>Send it to the group</h2><p class="mute">Your playing partners open the link on their phone, no app store and no account. Re-send any time to share the latest scores.</p>
+   <div class="row"><button class="btn taz grow" onclick="shareRound(S.live,false)">Share scores</button><button class="btn alt grow" onclick="shareRound(S.live,true)">Invite link</button></div></div>
+   <button class="btn block" onclick="finish()">Finish round</button>
+   <button class="btn alt block" style="margin-top:8px" onclick="if(confirm('Delete this round?')){S.live=null;save();render()}">Discard round</button>`:''}`;
+}
+function mv(d){S.live.h=Math.max(0,Math.min(S.live.holes-1,S.live.h+d));save();render()}
+function sc(k,d){const r=S.live,p=r.players[k],i=r.h;let v=p.s[i]||(d>0?r.par[i]-1:r.par[i]+1);v=Math.max(1,Math.min(15,v+d));p.s[i]=v;save();render()}
+function setPar(){const r=S.live;const v=parseInt(prompt('Par for hole '+(r.h+1),r.par[r.h]));if(v>=3&&v<=6){r.par[r.h]=v;save();render()}}
+function finish(){
+  const r=S.live;const me=r.players[0];const done=played(me);
+  if(done<r.holes&&!confirm(`${me.n} has ${r.holes-done} hole(s) without a score. Finish anyway?`))return;
+  if(r.holes===18&&done===18){S.rounds.push({date:r.date,course:r.course,gross:tot(me.s),rating:r.rating,slope:r.slope,holes:18});toast('Saved to your index')}
+  else toast('Round closed. Only full 18s count toward your index.');
+  S.live=null;S.tab='index';save();render();
+}
+function vIndex(){
+  const ix=indexOf(S.rounds);const rs=[...S.rounds].reverse();
+  const pts=S.rounds.slice(-12).map(r=>Math.round(diff(r)*10)/10);
+  const mx=Math.max(...pts,10),mn=Math.min(...pts,0);
+  const spark=pts.length>1?`<svg viewBox="0 0 300 80" width="100%" height="80" role="img" aria-label="Score differential trend"><polyline fill="none" stroke="var(--fair)" stroke-width="3" points="${pts.map((v,i)=>`${10+i*(280/(pts.length-1))},${70-((v-mn)/(mx-mn||1))*60}`).join(' ')}"/></svg>`:'';
+  return `<div class="card" style="text-align:center"><div class="mute">TeeUp Index</div><div class="big">${ix===null?'—':ix.toFixed(1)}</div>
+   <p class="note">${ix===null?`Save ${Math.max(0,3-S.rounds.filter(r=>r.holes===18).length)} more full round(s) to unlock it.`:`Based on your best ${({3:1,4:1,5:1,6:2,7:2,8:2,9:3,10:3,11:3,12:4,13:4,14:4,15:5,16:5,17:6,18:6,19:7,20:8})[Math.min(20,S.rounds.length)]} of your last ${Math.min(20,S.rounds.length)} rounds.`}</p>${spark}</div>
+  <div class="card"><h2>Add a round you already played</h2>
+   <div class="row"><div class="grow"><label class="f">Score (18 holes)</label><input class="t" id="g" inputmode="numeric" placeholder="88"></div>
+   <div class="grow"><label class="f">Date</label><input class="t" id="dt" type="date" value="${new Date().toISOString().slice(0,10)}"></div></div>
+   <label class="f">Course</label><input class="t" id="cn" list="cl" placeholder="The Tradition Golf Club"><datalist id="cl">${COURSES.map(c=>`<option>${esc(c.n)}</option>`).join('')}</datalist>
+   <div class="row"><div class="grow"><label class="f">Rating</label><input class="t" id="rr" inputmode="decimal" value="72.0"></div><div class="grow"><label class="f">Slope</label><input class="t" id="ss" inputmode="numeric" value="113"></div></div>
+   <button class="btn block" style="margin-top:12px" onclick="addPast()">Save round</button></div>
+  <div class="card"><h2>History</h2>${rs.length?rs.map((r,k)=>`<div class="prow"><div class="grow"><b>${r.gross}</b> · ${esc(r.course)}<div class="mute" style="font-size:13px">${fmt(r.date)} · diff ${diff(r).toFixed(1)}</div></div><button class="btn alt sm" onclick="delR(${S.rounds.length-1-k})">Remove</button></div>`).join(''):'<div class="empty mute">No rounds yet.</div>'}</div>
+  <p class="note">The TeeUp Index is an unofficial estimate built from the rounds you save in this app. It is not a USGA Handicap Index. Post your scores with your club or GHIN for an official one.</p>`;
+}
+function addPast(){const g=parseInt($('#g').value);if(!(g>=50&&g<=160)){toast('Enter an 18-hole score');return}
+  S.rounds.push({date:$('#dt').value,course:$('#cn').value||'Unknown course',gross:g,rating:parseFloat($('#rr').value)||72,slope:parseInt($('#ss').value)||113,holes:18});
+  S.rounds.sort((a,b)=>a.date<b.date?-1:1);save();render();toast('Round saved')}
+function delR(k){if(confirm('Remove this round?')){S.rounds.splice(k,1);save();render()}}
+function vMore(){
+  return `<div class="card"><h2>Your info</h2><p class="mute">This stays on your phone. Your name and contact go inside the round links you send, so partners can reach you about the beta.</p>
+   <label class="f">Name</label><input class="t" id="mn" value="${esc(S.me.name)}" placeholder="First and last">
+   <label class="f">Mobile (optional)</label><input class="t" id="mp" inputmode="tel" value="${esc(S.me.phone)}" placeholder="704-555-0100">
+   <label class="f">Email (optional)</label><input class="t" id="me" inputmode="email" value="${esc(S.me.email)}">
+   <button class="btn block" style="margin-top:12px" onclick="S.me={name:$('#mn').value.trim(),phone:$('#mp').value.trim(),email:$('#me').value.trim()};save();toast('Saved')">Save</button></div>
+  <div class="card"><h2>Put it on your home screen</h2><p class="mute"><b>iPhone:</b> open this page in Safari, tap the Share button, then <b>Add to Home Screen</b>.<br><b>Android:</b> tap the ⋮ menu in Chrome, then <b>Add to Home screen</b>.</p></div>
+  <div class="card"><h2>Charlotte courses</h2><div class="list">${COURSES.map(c=>`<a href="https://www.google.com/maps/search/${encodeURIComponent(c.n+' Charlotte NC')}" target="_blank" rel="noopener"><span><b>${esc(c.n)}</b><br><span class="mute">${esc(c.type)}</span></span><span>›</span></a>`).join('')}</div></div>
+  <div class="card"><h2>What's in the beta</h2><p class="mute">Hole-by-hole scoring, skins, a shareable card, your own index and the Charlotte calendar. Coming next: live scores that update on every phone at once, side games, and event sign-up reminders.</p>
+   <p class="mute">Scores save on this phone. Clearing your browser data will erase them.</p></div>
+  <div class="card"><h2>Appearance</h2><div class="chips">${['auto','light','dark'].map(m=>`<button class="${(S.theme||'auto')===m?'on':''}" onclick="setTheme('${m}')">${m[0].toUpperCase()+m.slice(1)}</button>`).join('')}</div></div>`;
+}
+function setTheme(m){S.theme=m;save();applyTheme();render()}
+function applyTheme(){if(!S.theme||S.theme==='auto')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',S.theme)}
+function vShared(){
+  const r=INCOMING;if(!r)return vHome();
+  const host=r.host||'Your playing partner';
+  const msg=encodeURIComponent(`Hey ${host.split(' ')[0]}, I'm in for the TeeUp CLT beta.`);
+  const tel=r.hostTel?`sms:${r.hostTel.replace(/[^\d+]/g,'')}${/iPhone|iPad/.test(navigator.userAgent)?'&':'?'}body=${msg}`:'';
+  const mail=r.hostMail?`mailto:${r.hostMail}?subject=${encodeURIComponent('TeeUp CLT beta')}&body=${msg}`:'';
+  return `<div class="banner"><b>${esc(host)}</b> shared this round from ${esc(r.course)} · ${fmt(r.date)}.</div>
+  ${vCard(r,false)}
+  <div class="card share"><h2>Join the beta</h2><p class="mute">TeeUp CLT is a free beta for Charlotte golfers: score your own rounds, track your index, and see local events.</p>
+   ${tel||mail?`<div class="row">${tel?`<a class="btn taz grow" style="text-align:center;text-decoration:none" href="${tel}">Text ${esc(host.split(' ')[0])}</a>`:''}${mail?`<a class="btn alt grow" style="text-align:center;text-decoration:none" href="${mail}">Email</a>`:''}</div>`:''}
+   <button class="btn ${tel||mail?'alt':'taz'} block" style="margin-top:8px" onclick="keepRound()">Save this card and start using it</button></div>`;
+}
+function keepRound(){
+  const r=JSON.parse(JSON.stringify(INCOMING));
+  if(!S.live){S.live=r;S.live.h=Math.min(r.holes-1,Math.max(0,...r.players.map(played)));toast('Card saved. You can keep scoring here.')}
+  history.replaceState(null,'',base());INCOMING=null;S.tab='play';save();render();
+}
+function render(){
+  applyTheme();tabs();hero();
+  const v={home:vHome,play:vPlay,index:vIndex,events:vEvents,more:vMore,shared:vShared}[S.tab]||vHome;
+  $('#view').innerHTML=v();
+  const c=$('#c');if(c)c.onchange=()=>{$('#co').style.display=c.value==='__other'?'block':'none'};
+}
+render();
+</script>
+</body>
+</html>

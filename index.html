@@ -447,9 +447,9 @@ const hm=m=>`${Math.floor(m/60)}:${String(Math.round(m%60)).padStart(2,'0')}`;
 function paceCard(){const R=paceRows(),s=S.sim;return`<div class="card"><h2>⏱️ Pace of play board</h2>${R.map((r,i)=>{const ahead=R[i-1],gapH=ahead&&!r.done?(ahead.done?18:ahead.g.h)-r.g.h:null,st=r.dl==null?['—','']:r.dl<=2?['On pace','ok']:r.dl<=8?['Slipping · +'+Math.round(r.dl)+' min','tbc']:['Behind · +'+Math.round(r.dl)+' min','new'];
  return`<div class="pc"><span class="chip" style="background:#ffd34d;color:#111;font-weight:800;text-align:center">G${r.g.i+1}</span><div><b>${r.done?'Finished':'Hole '+(r.g.h+1)}</b> <span class="mut">· ${r.g.ps.map(p=>p.name.split(' ')[0]).join(', ')}</span><div class="src">${r.el!=null?`${r.done?'Round time':'On course'} ${hm(r.el)}${s?` · teed off ${fmtT(s.start+r.g.i*s.gap)}`:''}`:'Timing starts with a live round or the simulation'}${gapH!=null&&gapH>=2?` · <b style="color:var(--r)">${gapH} holes open ahead</b>`:''}</div></div><span class="chip ${st[1]==='new'?'':st[1]}" style="${st[1]==='new'?'background:#fee2e2;color:#991b1b;':''}font-size:12.5px;padding:4px 10px">${st[0]}</span></div>`}).join('')}
  <div class="src" style="margin-top:6px">Target is John's goal of under four hours (13 min 20 sec a hole).${S.cond.cart==='cpo'?' Cart path only usually adds time — the simulation allows for it.':''} In the hosted version timing comes from when scores are posted.</div></div>`}
-function vOG(){if(!S.org)return`<div class="card" style="max-width:520px"><h2>🔑 Organizer desk</h2><div class="mut" style="margin-bottom:10px">For John and Xander only: live round, score corrections, conditions and approvals.</div><div style="display:flex;gap:8px"><input type="password" id="pin" inputmode="numeric" placeholder="Organizer PIN" onkeydown="if(event.key==='Enter')orgUnlock()"><button class="btn" style="width:auto;padding:10px 20px" onclick="orgUnlock()">Unlock</button></div>${S.pxMsg?`<div class="src" style="color:var(--mar);font-weight:600;margin-top:8px">${esc(S.pxMsg)}</div>`:''}</div>`;
+function vOG(){if(!S.org)return`<div class="card" style="max-width:520px"><h2>🔑 Organizer desk</h2><div class="mut" style="margin-bottom:10px">For John, Willie and Xander only: sign-ups, live round, score corrections, conditions and approvals.</div><div style="display:flex;gap:8px"><input type="password" id="pin" inputmode="numeric" placeholder="Organizer PIN" onkeydown="if(event.key==='Enter')orgUnlock()"><button class="btn" style="width:auto;padding:10px 20px" onclick="orgUnlock()">Unlock</button></div>${S.pxMsg?`<div class="src" style="color:var(--mar);font-weight:600;margin-top:8px">${esc(S.pxMsg)}</div>`:''}</div>`;
  const c=S.cond,pend=PH.filter(p=>p.st==='pending').length,opt=(v,l)=>`<button class="${c.cart===v?'on':''}" onclick="setCond('cart','${v}')">${l}</button>`;
- return`${LIVE?adminLive():''}<div class="two"><div><div class="card"><h2>🛺 Today's conditions</h2><div class="seg" style="display:flex;width:100%">${opt('normal','Normal')}${opt('90','90-degree')}${opt('cpo','Cart path only')}</div><div class="src" style="margin:-4px 0 8px">${CART[c.cart][2]} Everyone gets an alert and a banner the moment you change it.</div>
+ return`${suCard()}${LIVE?adminLive():''}<div class="two"><div><div class="card"><h2>🛺 Today's conditions</h2><div class="seg" style="display:flex;width:100%">${opt('normal','Normal')}${opt('90','90-degree')}${opt('cpo','Cart path only')}</div><div class="src" style="margin:-4px 0 8px">${CART[c.cart][2]} Everyone gets an alert and a banner the moment you change it.</div>
  <label class="t"><span>🍂 Leaf Rule<small>Free drop for a ball the group agrees is lost in leaves</small></span>${tg(c.leaf,`setCond('leaf',${!c.leaf})`)}</label><label class="t"><span>🧼 Lift, clean and place<small>Ball in hand, one scorecard length</small></span>${tg(c.lcp,`setCond('lcp',${!c.lcp})`)}</label>
  <label class="t" style="display:block"><span>📢 Note to the group<small>Frost delay, temporary green, anything else</small></span><div style="display:flex;gap:8px;margin-top:6px"><input type="text" id="cnote" maxlength="90" value="${esc(c.note)}" placeholder="e.g. Frost delay — first tee time moves to 8:30"><button class="btn" style="width:auto;padding:10px 16px" onclick="setCond('note',document.getElementById('cnote').value.trim())">Post</button></div></label></div>
  <div class="card"><h2>Quick actions</h2><div class="tiles" style="grid-template-columns:repeat(auto-fill,minmax(130px,1fr))">${tile('px','📸','Photo approvals',pend?pend+' waiting':'All clear',pend)}${tile('kp','🎯','Pin claims','Review photos')}${tile('mo','💵','Cash ledger','Buy-ins and payouts')}${tile('tv','📺','Clubhouse TV','Big-screen board')}</div><button class="btn alt" style="margin-top:10px" onclick="tabNudge()">🔔 Nudge the unpaid</button><button class="btn alt" style="margin-top:8px" onclick="S.org=false;save();draw()">Lock the desk</button></div></div>
@@ -653,10 +653,43 @@ const me=(typeof myName==='function'?myName():'')||'';let d={};try{d=JSON.parse(
 function sendJoin(){if(jnClosed()){notify('fun','Sign-ups are closed for this Sunday. Reach out to John or Xander for next week.');draw();return}const g=id=>(document.getElementById(id)||{}).value||'',n=g('jnn').trim(),c=g('jnc').trim(),m=g('jnm').trim();
  if(!n){notify('fun','Add your name first so we know who is in.');return}
  const u=JN_USE.filter((x,i)=>(document.getElementById('jnu'+i)||{}).checked);
- try{lsS('teeup-jn',JSON.stringify({n,c,u,m}))}catch(e){}S.jnHide=true;save();
+ const su={id:'d-'+DEV,n,c,u,m,ts:Date.now()};try{lsS('teeup-jn',JSON.stringify(su))}catch(e){}suAdd(su);saveSU();suPost(su);S.jnHide=true;save();
  const body=`Count me in for TeeUp / the Sunday Group.\n\nName: ${n}\nContact: ${c||'(not given)'}\nInterested in: ${u.length?u.join('; '):'(nothing checked)'}\nNotes: ${m||'(none)'}\n\nSent from the TeeUp app.`;
  window.open('mailto:xander@hassantranspo.com?subject='+encodeURIComponent('TeeUp: count me in - '+n)+'&body='+encodeURIComponent(body),'_blank');
  notify('fun','Thanks '+n.split(' ')[0]+'! Tap Send in your email app and you are on the list.');draw()}
+// ---- Sign-up board: everyone who taps "Count me in" shows up here for the admins
+const SU_TOPIC='teeup-tsg-signups-q7k2vx9m'+(TEST?'-test':''),SU_RELAY='https://ntfy.sh/';
+let SU={};try{SU=JSON.parse(localStorage.getItem('teeup-su'))||{}}catch(e){}
+function saveSU(){try{localStorage.setItem('teeup-su',JSON.stringify(SU))}catch(e){}}
+function suAdd(o){if(!o||typeof o.n!=='string'||!o.n.trim())return false;const k=String(o.id||('n-'+o.n.trim().toLowerCase())).slice(0,40),old=SU[k],ts=+o.ts||Date.now();
+ if(old&&old.ts>=ts&&!o.del)return false;if(o.del){if(!old)return false;delete SU[k];return true}
+ SU[k]={id:k,n:o.n.trim().slice(0,60),c:String(o.c||'').slice(0,80),u:Array.isArray(o.u)?o.u.slice(0,8).map(x=>String(x).slice(0,60)):[],m:String(o.m||'').slice(0,400),ts,by:o.by?String(o.by).slice(0,30):''};return true}
+async function suPost(o){try{const r=await fetch(SU_RELAY+SU_TOPIC,{method:'POST',body:JSON.stringify(o)});return r.ok}catch(e){return false}}
+async function suLoad(){S.suMsg='Checking for new sign-ups…';draw();const seen=new Set();
+ try{const r=await fetch(SU_RELAY+SU_TOPIC+'/json?poll=1&since=all');if(!r.ok)throw 0;(await r.text()).split('\n').forEach(l=>{if(!l)return;try{const e=JSON.parse(l);if(e.event!=='message')return;const o=JSON.parse(e.message);if(o.id)seen.add(String(o.id));suAdd(o)}catch(x){}});saveSU();
+  // the relay only holds messages for about 12 hours, so an admin phone re-shares anything it has saved
+  Object.values(SU).filter(x=>!seen.has(x.id)).slice(0,60).forEach(x=>suPost(x));
+  S.suMsg='Up to date as of '+new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})}
+ catch(e){S.suMsg='Could not reach the sign-up board right now. Showing what this phone has saved.'}draw()}
+function suKeepAlive(){try{const d=JSON.parse(localStorage.getItem('teeup-jn')||'null');if(!d||!d.id||!d.n||Date.now()>JN_CLOSE)return;
+ const last=+localStorage.getItem('teeup-su-ka')||0;if(Date.now()-last<6*3600e3)return;localStorage.setItem('teeup-su-ka',String(Date.now()));suPost(d)}catch(e){}}
+function suAddByHand(){const g=id=>((document.getElementById(id)||{}).value||'').trim(),n=g('sun'),c=g('suc');if(!n){S.suMsg='Type a name first.';draw();return}
+ const o={id:'h-'+Math.random().toString(36).slice(2,9),n,c,u:['Added by an admin'],m:'',ts:Date.now(),by:first(myName())||'Admin'};suAdd(o);saveSU();suPost(o);S.suMsg='Added '+n+'.';draw()}
+function suRemove(k){const x=SU[k];if(!x||!confirm('Take '+x.n+' off the sign-up board?'))return;delete SU[k];saveSU();suPost({id:k,n:x.n,del:1,ts:Date.now()});draw()}
+function suCopy(){const L=suList(),t='TeeUp sign-ups ('+L.length+')\n\n'+L.map((x,i)=>(i+1)+'. '+x.n+(x.c?' | '+x.c:'')+(x.u.length?' | '+x.u.join('; '):'')+(x.m?' | '+x.m:'')+(x.ts>JN_CLOSE?' | after cutoff':'')).join('\n');
+ (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>{S.suMsg='Copied. Paste it into a text, email or John\'s spreadsheet.';draw()},()=>prompt('Copy the list:',t))}
+const suList=()=>Object.values(SU).sort((a,b)=>a.ts-b.ts);
+function suCard(){const L=suList(),inT=L.filter(x=>x.ts<=JN_CLOSE).length,late=L.length-inT,guests=L.filter(x=>x.u.includes('Bringing a guest')).length,
+ when=t=>new Date(t).toLocaleString([],{weekday:'short',hour:'numeric',minute:'2-digit'}),
+ closeTxt=new Date(JN_CLOSE).toLocaleString([],{weekday:'long',hour:'numeric',minute:'2-digit'}),inp='padding:12px;border:1px solid var(--line);border-radius:8px;font:inherit;font-size:16px;flex:1;min-width:0';
+ return`<div class="card" style="border:2px solid var(--g)"><h2>🙋 Sign-up board <span class="mut" style="font-weight:500">· ${L.length} signed up</span></h2>
+ <div class="mut" style="font-size:16px;margin-bottom:8px">Everyone who tapped "Count me in." Sign-ups ${Date.now()>JN_CLOSE?'closed':'close'} ${esc(closeTxt)}.</div>
+ <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px"><span class="pill" style="background:var(--g)">${inT} for Sunday</span>${guests?`<span class="pill" style="background:var(--gold)">${guests} bringing a guest</span>`:''}${late?`<span class="pill" style="background:var(--mut)">${late} after cutoff</span>`:''}</div>
+ ${L.length?L.map((x,i)=>`<div style="border-top:1px solid var(--line);padding:10px 0;display:flex;gap:10px;align-items:flex-start"><div style="font-weight:800;color:var(--mut);min-width:22px">${i+1}</div><div style="flex:1;min-width:0"><div style="font-size:17px"><b>${esc(x.n)}</b>${x.ts>JN_CLOSE?' <span class="mut">(after cutoff)</span>':''}</div>${x.c?`<div style="font-size:16px">${esc(x.c)}</div>`:''}${x.u.length?`<div class="mut" style="font-size:15px">${esc(x.u.join(' · '))}</div>`:''}${x.m?`<div style="font-size:15px;margin-top:2px">“${esc(x.m)}”</div>`:''}<div class="src">${esc(when(x.ts))}${x.by?' · added by '+esc(x.by):''}</div></div><button class="pill" style="border:0;cursor:pointer;background:var(--r)" onclick="suRemove('${esc(x.id)}')">Remove</button></div>`).join(''):`<div class="mut" style="font-size:16px;padding:8px 0">No sign-ups yet. They show up here as people tap "Count me in."</div>`}
+ <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="btn" style="flex:1" onclick="suLoad()">🔄 Check for new sign-ups</button><button class="btn alt" style="flex:1" onclick="suCopy()">📋 Copy the list</button></div>
+ <div style="margin-top:14px;font-size:16px"><b>Someone texted or called instead?</b> Add them here.</div>
+ <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px"><input id="sun" placeholder="Name" style="${inp}"><input id="suc" placeholder="Phone or email (optional)" style="${inp}"><button class="btn" style="width:auto;padding:10px 18px" onclick="suAddByHand()">Add</button></div>
+ ${S.suMsg?`<div class="src" style="margin-top:8px;font-weight:600">${esc(S.suMsg)}</div>`:''}</div>`}
 // ---- "Who are you?" on first open
 function whoCard(){const gs=[];P().forEach((p,i)=>(gs[i>>2]=gs[i>>2]||[]).push(p));
  return`<div class="card" style="border:2px solid var(--mar)"><h2 style="font-size:17px">👋 Welcome! Who's playing on this phone?</h2><div class="mut" style="margin-bottom:8px;font-size:16px">Tap your name, add a selfie if you like, and you're in.</div>
@@ -717,7 +750,7 @@ function copyRound(){const t=roundText();(navigator.clipboard?navigator.clipboar
 const ADMH=['477c7a782afc393c454a20cd5303172d86d5d5aabf5240fc69430bc6bdfe060b','e56e76bf6867c64fe27a7802fc3091cb69bf230bcfde8ee2df9fdf4b72ba9e1c','5650b0a0f4c1e241ff40234699cf7b94e746be23a256f4fd5ed2c60038dddfb4']; // Xander, John, Willie
 async function orgUnlock(){const v=(document.getElementById('pin').value||'').trim();let ok=false;
  try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('teeup-tsg|'+v));ok=[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');ok=ADMH.includes(ok)}catch(e){ok=false}
- S.org=ok;S.pxMsg=ok?'':'That PIN did not match.';save();draw()}
+ S.org=ok;S.pxMsg=ok?'':'That PIN did not match.';save();draw();if(ok)suLoad()}
 function fixMe(auto){try{S.tab='lb';S.dr={};S.eh=null;S.eg=null;S.sim=null;S.auto=false;save()}catch(e){}
  const u=location.pathname+(TEST?'?test&':'?')+'r='+Date.now()+(auto?'':'#fixed'),go=()=>location.replace(u),jobs=[];
  if(navigator.serviceWorker)jobs.push(navigator.serviceWorker.getRegistrations().then(r=>Promise.all(r.map(x=>x.update().catch(()=>{})))).catch(()=>{}));
@@ -735,6 +768,7 @@ function adminLive(){const n=P().reduce((a,p)=>a+thru(p),0);
  <button class="btn alt" style="margin-top:8px;color:#b3121a" onclick="pubReset()">🔄 Start a fresh round (clears all scores)</button>
  <div class="src" style="margin-top:6px">To correct a score, pick the group, go to the hole, change it and tap Update. It overrides every phone. Save the scorecard the same day: the live board only keeps scores for about 12 hours.</div></div>`}
 if(location.hash==='#admin'){S.tab='og'}
+setTimeout(()=>{suKeepAlive();if(S.org)suLoad()},2500);
 if(LIVE&&S.tab==='st')S.tab='lb';
 if(location.hash==='#fixed'){setTimeout(()=>notify('grp','✅ App refreshed. Scores re-checked against the live board.',true),900);try{history.replaceState(null,'',location.pathname+(TEST?'?test':''))}catch(e){}}
 (function(){const c=document.createElement('style');c.textContent=`

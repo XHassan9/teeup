@@ -635,9 +635,12 @@ function photoCard(force){const me=myName();if(!me)return'';const has=!!AV[me];
 (function(){const st=document.createElement('style');st.textContent=`.av{border-radius:50%;object-fit:cover;flex:none;vertical-align:middle;display:inline-flex;align-items:center;justify-content:center;margin-right:8px;border:2px solid #fff;box-shadow:0 0 0 1px var(--line)}.avi{background:#1f4d2b;color:#f3e7c4;font-weight:700;letter-spacing:.5px}.who .av{margin-right:6px}`;document.head.appendChild(st)})();
 
 // ---- "Count me in": interest sign-up, goes to Xander by email (no server needed)
-function joinBanner(){if(S.jnHide)return'';return`<div class="card" style="border:2px solid var(--g);background:#f4faf3"><h2 style="font-size:17px">🙋 New here, or want in on Sunday?</h2><div class="mut" style="font-size:16px;margin-bottom:10px">Everyone is welcome, regulars and first-timers. Tell John and Xander you're interested. It takes 20 seconds.</div><button class="btn" style="font-size:17px;padding:14px;width:100%" onclick="go('jn')">🙋 Count me in</button><button class="btn alt" style="margin-top:8px" onclick="S.jnHide=true;save();draw()">Not now</button></div>`}
+const JN_CLOSE=new Date('2026-11-27T21:00:00-05:00').getTime(); // sign-ups close Fri 9 PM ET to lock in Sunday
+const jnClosed=()=>Date.now()>JN_CLOSE&&!S.org;
+function joinBanner(){if(S.jnHide||jnClosed())return'';return`<div class="card" style="border:2px solid var(--g);background:#f4faf3"><h2 style="font-size:17px">🙋 New here, or want in on Sunday?</h2><div class="mut" style="font-size:16px;margin-bottom:10px">Everyone is welcome, regulars and first-timers. Tell John and Xander you're interested. It takes 20 seconds.</div><button class="btn" style="font-size:17px;padding:14px;width:100%" onclick="go('jn')">🙋 Count me in</button><button class="btn alt" style="margin-top:8px" onclick="S.jnHide=true;save();draw()">Not now</button></div>`}
 const JN_USE=['Playing in the Sunday group','Live scoring and the leaderboard','Skins and closest to the pin','Side bets','Photos and the group wall','Bringing a guest','Just want to follow along'];
-function vJN(){const me=(typeof myName==='function'?myName():'')||'';let d={};try{d=JSON.parse(lsG('teeup-jn')||'{}')}catch(e){}
+function vJN(){if(jnClosed())return`<div class="card"><h2>🔒 Sign-ups are closed for this Sunday</h2><div class="mut" style="font-size:17px">We locked in the players for this Sunday (weather pending). Want in next week? Reach out to John or Xander.</div></div>`;
+const me=(typeof myName==='function'?myName():'')||'';let d={};try{d=JSON.parse(lsG('teeup-jn')||'{}')}catch(e){}
  const chk=JN_USE.map((x,i)=>`<label style="display:flex;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line);font-size:17px"><input type="checkbox" id="jnu${i}" style="width:22px;height:22px" ${(d.u||[]).includes(x)?'checked':''}>${esc(x)}</label>`).join('');
  const inp='width:100%;box-sizing:border-box;padding:12px;border:1px solid var(--line);border-radius:8px;font:inherit;font-size:17px';
  return`<div class="card"><h2>🙋 Count me in</h2><div class="mut" style="font-size:16px;margin-bottom:12px">Playing every Sunday, or just curious? Anyone who wants to take part is welcome. Fill this out and it goes straight to John and Xander. No account needed.</div>
@@ -647,7 +650,7 @@ function vJN(){const me=(typeof myName==='function'?myName():'')||'';let d={};tr
  <label style="display:block;font-size:16px;margin:12px 0 4px"><b>Anything you would want in the app?</b> <span class="mut">(optional)</span></label><textarea id="jnm" rows="3" style="${inp}" placeholder="Ideas, questions, who else should be here...">${esc(d.m||'')}</textarea>
  <button class="btn" style="margin-top:14px;font-size:17px;padding:14px;width:100%" onclick="sendJoin()">📨 Send to John and Xander</button>
  <div class="src" style="margin-top:10px">This opens a ready-to-send email on your phone. Tap Send there and you're on the list.</div></div>`}
-function sendJoin(){const g=id=>(document.getElementById(id)||{}).value||'',n=g('jnn').trim(),c=g('jnc').trim(),m=g('jnm').trim();
+function sendJoin(){if(jnClosed()){notify('fun','Sign-ups are closed for this Sunday. Reach out to John or Xander for next week.');draw();return}const g=id=>(document.getElementById(id)||{}).value||'',n=g('jnn').trim(),c=g('jnc').trim(),m=g('jnm').trim();
  if(!n){notify('fun','Add your name first so we know who is in.');return}
  const u=JN_USE.filter((x,i)=>(document.getElementById('jnu'+i)||{}).checked);
  try{lsS('teeup-jn',JSON.stringify({n,c,u,m}))}catch(e){}S.jnHide=true;save();
@@ -711,9 +714,9 @@ function shareRound(){const name=`sunday-group-${ROUND}.csv`,csv=roundCSV(),text
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=name;document.body.appendChild(a);a.click();a.remove();notify('grp','📥 Scorecard file saved to this device.',true)}
 function copyRound(){const t=roundText();(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>notify('grp','📋 Results copied. Paste them into an email or text.',true),()=>prompt('Copy the results:',t))}
 // ---- Admin (John + Xander) and the fix button
-const ADMH='477c7a782afc393c454a20cd5303172d86d5d5aabf5240fc69430bc6bdfe060b';
+const ADMH=['477c7a782afc393c454a20cd5303172d86d5d5aabf5240fc69430bc6bdfe060b','e56e76bf6867c64fe27a7802fc3091cb69bf230bcfde8ee2df9fdf4b72ba9e1c','5650b0a0f4c1e241ff40234699cf7b94e746be23a256f4fd5ed2c60038dddfb4']; // Xander, John, Willie
 async function orgUnlock(){const v=(document.getElementById('pin').value||'').trim();let ok=false;
- try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('teeup-tsg|'+v));ok=[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')===ADMH}catch(e){}
+ try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('teeup-tsg|'+v));ok=[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');ok=ADMH.includes(ok)}catch(e){ok=false}
  S.org=ok;S.pxMsg=ok?'':'That PIN did not match.';save();draw()}
 function fixMe(auto){try{S.tab='lb';S.dr={};S.eh=null;S.eg=null;S.sim=null;S.auto=false;save()}catch(e){}
  const u=location.pathname+(TEST?'?test&':'?')+'r='+Date.now()+(auto?'':'#fixed'),go=()=>location.replace(u),jobs=[];
